@@ -1,0 +1,20 @@
+{
+  "name": "blakvghost/juste",
+  "description": "Bravo PHP MVC Framework Core",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Juste\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Kabirou ALASSANE",
+      "email": "kabirou2001@gmail.com"
+    }
+  ],
+  "require": {
+    "symfony/dotenv": "^6.2"
+  }
+}
