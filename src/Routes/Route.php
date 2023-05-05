@@ -101,6 +101,9 @@ class Route extends Common
 
     /**
      * Set a GET route
+     * @param string $route
+     * @param array $controller
+     * @return RouteUtils
      */
     public static function get(string $route, array $controller)
     {
@@ -113,7 +116,7 @@ class Route extends Common
     /**
      * Set POST route
      */
-    public static function post($route, $controller)
+    public static function post(string $route, array $controller)
     {
         $static = new static();
 
