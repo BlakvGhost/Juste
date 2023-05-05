@@ -75,46 +75,59 @@ class Route extends Common
 
         $routeName = $route['route'];
         $routes = [
-            ["{$routeName}/index" => 'index', "param" => null],
-            ["{$routeName}/create" => 'create', "param" => null],
-            ["{$routeName}/store" => 'store', "param" => null],
-            ["{$routeName}/show" => 'show', "param" => 'pk'],
-            ["{$routeName}/edit" => 'edit', "param" => 'pk'],
-            ["{$routeName}/update" => 'update', "param" => 'pk'],
-            ["{$routeName}/delete" => 'destroy', "param" => 'pk']
+            ['route' => "{$routeName}", 'function' => 'index', "param" => null],
+            ['route' => "{$routeName}/create", 'function' => 'create', "param" => null],
+            ['route' => "{$routeName}/store", 'function' => 'store', "param" => null],
+            ['route' => "{$routeName}", 'function' => 'show', "param" => 'pk'],
+            ['route' => "{$routeName}/edit", 'function' => 'edit', "param" => 'pk'],
+            ['route' => "{$routeName}/update", 'function' => 'update', "param" => 'pk'],
+            ['route' => "{$routeName}/delete", 'function' => 'destroy', "param" => 'pk']
         ];
-        
+
         foreach ($routes as $key => $r) {
-            $this->dd($r['route'], $r['param']);
-            if ($this->isActiveRoute($r[0], $r[1])) {
-                $instance = new $controller[0]();
+            //$this->dd($r['route'], $r['param']);
+            if ($this->isActiveRoute($r['route'], $r['param'])) {
+                $function = $r['function'];
+                $instance = new $controller();
+
+                if ($r['param']) {
+
+                    $param = $this->getParamFromUrl()['param'];
+
+                    $payloads = $instance->$function($param);
+                    setPayloads($payloads);
+                } else {
+                    $payloads =
+                        $instance->$function();
+                    setPayloads($payloads);
+                }
             }
         }
 
-        if ($this->isActiveRoute('')) {
+        // if ($this->isActiveRoute('')) {
 
-            $instance = new $controller[0]();
+        //     $instance = new $controller[0]();
 
-            switch ($this->server("REQUEST_METHOD")) {
-                case 'GET':
-                    $function = 'index';
-                    break;
-                case 'POST':
-                    $function = 'store';
-                    break;
-                case 'PUT':
-                    $function = 'update';
-                    break;
-                case 'DELETE':
-                    $function = 'destroy';
-                    break;
-                default:
-                    $function = 'index';
-                    break;
-            }
+        //     switch ($this->server("REQUEST_METHOD")) {
+        //         case 'GET':
+        //             $function = 'index';
+        //             break;
+        //         case 'POST':
+        //             $function = 'store';
+        //             break;
+        //         case 'PUT':
+        //             $function = 'update';
+        //             break;
+        //         case 'DELETE':
+        //             $function = 'destroy';
+        //             break;
+        //         default:
+        //             $function = 'index';
+        //             break;
+        //     }
 
-            $instance->$function();
-        }
+        //     $instance->$function();
+        // }
     }
 
     /**
