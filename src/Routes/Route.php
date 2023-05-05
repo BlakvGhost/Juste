@@ -2,7 +2,7 @@
 
 namespace Juste\Facades\Routes;
 
-use Juste\Routes\Dependance;
+use Juste\Facades\Routes\Dependance;
 
 class Route extends Dependance
 {
@@ -36,18 +36,21 @@ class Route extends Dependance
 
     private function isActiveRoute(string $route, $param = false): bool
     {
+        $route = trim($route, '/');
         if ($param) {
             $routes = $this->getParamFromUrl();
             return $routes['route'] == $route;
         }
+
         return $this->getRoute() == $route;
     }
 
     private function loadRoute(string $route, array $controller, string $method)
     {
         $routes = $this->getRouteNameAndParams($route);
+        $params = $routes['params'] ?? null;
 
-        if ($this->isActiveRoute($routes['route'])) {
+        if ($this->isActiveRoute($routes['route'], $params)) {
 
             if (($this->server("REQUEST_METHOD") == $method) || $method == 'any') {
                 $function = $controller[1];
@@ -59,6 +62,7 @@ class Route extends Dependance
 
                     if ($injectable = $this->resolveDependance($routes['params'], $param)) {
                         $payloads = $instance->$function($injectable);
+
                         return setPayloads($payloads);
                     }
 
@@ -76,68 +80,45 @@ class Route extends Dependance
 
     private function loadResoucesRoute(string $route, string $controller)
     {
-        $route = $this->getRouteNameAndParams($route);
-
-        $routeName = $route['route'];
         $routes = [
-            ['route' => "{$routeName}", 'function' => 'index', "param" => null],
-            ['route' => "{$routeName}/create", 'function' => 'create', "param" => null],
-            ['route' => "{$routeName}/store", 'function' => 'store', "param" => null],
-            ['route' => "{$routeName}", 'function' => 'show', "param" => 'pk'],
-            ['route' => "{$routeName}/edit", 'function' => 'edit', "param" => 'user'],
-            ['route' => "{$routeName}/update", 'function' => 'update', "param" => 'pk'],
-            ['route' => "{$routeName}/delete", 'function' => 'destroy', "param" => 'pk']
+            ['route' => "{$route}", 'function' => 'index', "method" => 'GET'],
+            ['route' => "{$route}/create", 'function' => 'create', "method" => 'GET'],
+            ['route' => "{$route}/", 'function' => 'store', "method" => 'POST'],
+            ['route' => "{$route}/:user", 'function' => 'show', "method" => 'GET'],
+            ['route' => "{$route}/edit/:user", 'function' => 'edit', "method" => 'GET'],
+            ['route' => "{$route}/:user", 'function' => 'update', "method" => 'PUT'],
+            ['route' => "{$route}/:user", 'function' => 'destroy', "method" => 'DELETE']
         ];
 
         foreach ($routes as $key => $r) {
+            $controller_arr = [$controller, $r['function']];
+            $this->loadRoute($r['route'], $controller_arr, $r['method']);
 
-            if ($this->isActiveRoute($r['route'], $r['param'])) {
-                $function = $r['function'];
-                $instance = new $controller();
+            $utils = new RouteUtils($r['route'], $controller_arr);
+            $utils->name($route . $r['function']);
 
-                if ($r['param']) {
+            // if ($this->isActiveRoute($r['route'], $r['param'])) {
+            //     $function = $r['function'];
+            //     $instance = new $controller();
 
-                    $param = $this->getParamFromUrl()['param'];
+            //     if ($r['param']) {
 
-                    if ($injectable = $this->resolveDependance($r['param'], $param)) {
-                        $payloads = $instance->$function($injectable);
-                        return setPayloads($payloads);
-                    }
+            //         $param = $this->getParamFromUrl()['param'];
 
-                    $payloads = $instance->$function($param);
-                    setPayloads($payloads);
-                } else {
-                    $payloads =
-                        $instance->$function();
-                    setPayloads($payloads);
-                }
-            }
+            //         if ($injectable = $this->resolveDependance($r['param'], $param)) {
+            //             $payloads = $instance->$function($injectable);
+            //             return setPayloads($payloads);
+            //         }
+
+            //         $payloads = $instance->$function($param);
+            //         setPayloads($payloads);
+            //     } else {
+            //         $payloads =
+            //             $instance->$function();
+            //         setPayloads($payloads);
+            //     }
+            // }
         }
-
-        // if ($this->isActiveRoute('')) {
-
-        //     $instance = new $controller[0]();
-
-        //     switch ($this->server("REQUEST_METHOD")) {
-        //         case 'GET':
-        //             $function = 'index';
-        //             break;
-        //         case 'POST':
-        //             $function = 'store';
-        //             break;
-        //         case 'PUT':
-        //             $function = 'update';
-        //             break;
-        //         case 'DELETE':
-        //             $function = 'destroy';
-        //             break;
-        //         default:
-        //             $function = 'index';
-        //             break;
-        //     }
-
-        //     $instance->$function();
-        // }
     }
 
     /**
@@ -178,6 +159,6 @@ class Route extends Dependance
         $static = new static();
 
         $static->loadResoucesRoute($route, $controller);
-        return new RouteUtils($route, [$controller]);
+        return;
     }
 }
