@@ -2,9 +2,9 @@
 
 namespace Juste\Facades\Routes;
 
-use Juste\Facades\Helpers\Common;
+use Juste\Routes\Dependance;
 
-class Route extends Common
+class Route extends Dependance
 {
     private function getRoute(): string
     {
@@ -57,6 +57,11 @@ class Route extends Common
 
                     $param = $this->getParamFromUrl()['param'];
 
+                    if ($injectable = $this->resolveDependance($routes['params'], $param)) {
+                        $payloads = $instance->$function($injectable);
+                        return setPayloads($payloads);
+                    }
+
                     $payloads = $instance->$function($param);
                     setPayloads($payloads);
                 } else {
@@ -79,13 +84,13 @@ class Route extends Common
             ['route' => "{$routeName}/create", 'function' => 'create', "param" => null],
             ['route' => "{$routeName}/store", 'function' => 'store', "param" => null],
             ['route' => "{$routeName}", 'function' => 'show', "param" => 'pk'],
-            ['route' => "{$routeName}/edit", 'function' => 'edit', "param" => 'pk'],
+            ['route' => "{$routeName}/edit", 'function' => 'edit', "param" => 'user'],
             ['route' => "{$routeName}/update", 'function' => 'update', "param" => 'pk'],
             ['route' => "{$routeName}/delete", 'function' => 'destroy', "param" => 'pk']
         ];
 
         foreach ($routes as $key => $r) {
-            //$this->dd($r['route'], $r['param']);
+
             if ($this->isActiveRoute($r['route'], $r['param'])) {
                 $function = $r['function'];
                 $instance = new $controller();
@@ -93,6 +98,11 @@ class Route extends Common
                 if ($r['param']) {
 
                     $param = $this->getParamFromUrl()['param'];
+
+                    if ($injectable = $this->resolveDependance($r['param'], $param)) {
+                        $payloads = $instance->$function($injectable);
+                        return setPayloads($payloads);
+                    }
 
                     $payloads = $instance->$function($param);
                     setPayloads($payloads);

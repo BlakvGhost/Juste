@@ -12,7 +12,7 @@ class Controller extends Common
      * @param string $viewPath
      * @return array full view path or 404 view path with context globale data
      */
-    protected function render($view, $title = '', $context = null)
+    protected function render($view, $title = '', $context = null): array
     {
         $view  = VIEW_PATH . DS . $view . '.php';
 
@@ -21,7 +21,21 @@ class Controller extends Common
         return [
             'view_path' => $view,
             'context' => $context ?? [],
-            'title' => $title
+            'title' => $title,
+            'type' => 'view'
+        ];
+    }
+
+    /**
+     * This method returns and print a html code string.
+     * @param string $html
+     * @return array full html code with kind of return 'html'
+     */
+    protected function html(string $html): array
+    {
+        return [
+            'type' => 'html',
+            'html' => $html
         ];
     }
 
@@ -46,7 +60,7 @@ class Controller extends Common
     /**
      * This method checks whether the user is authenticated by checking if the user array is not empty. If $statut is true, it returns nothing if the user is authenticated and an error message if the user is not authenticated. If $statut is false, it returns nothing if the user is not authenticated and an error message if the user is authenticated. It uses the back() method to redirect the user back to the previous page.
      */
-    protected function mustAuthenticate(bool $statut = true)
+    protected function mustAuthenticate(bool $statut = true): void
     {
         if ($statut) {
             count($this->user()) ? null : $this->back()->with("Connect You first before accessing this resource");
