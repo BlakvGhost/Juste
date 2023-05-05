@@ -71,9 +71,27 @@ class Route extends Common
 
     private function loadResoucesRoute(string $route, string $controller)
     {
-        $routes = $this->getRouteNameAndParams($route);
+        $route = $this->getRouteNameAndParams($route);
 
-        if ($this->isActiveRoute($routes['route'])) {
+        $routeName = $route['route'];
+        $routes = [
+            ["{$routeName}/index" => 'index', "param" => null],
+            ["{$routeName}/create" => 'create', "param" => null],
+            ["{$routeName}/store" => 'store', "param" => null],
+            ["{$routeName}/show" => 'show', "param" => 'pk'],
+            ["{$routeName}/edit" => 'edit', "param" => 'pk'],
+            ["{$routeName}/update" => 'update', "param" => 'pk'],
+            ["{$routeName}/delete" => 'destroy', "param" => 'pk']
+        ];
+        
+        foreach ($routes as $key => $r) {
+            $this->dd($r['route'], $r['param']);
+            if ($this->isActiveRoute($r[0], $r[1])) {
+                $instance = new $controller[0]();
+            }
+        }
+
+        if ($this->isActiveRoute('')) {
 
             $instance = new $controller[0]();
 

@@ -149,10 +149,10 @@ class Common
     /**
      * make var_dump() and exit() in pre tag
      */
-    protected function dd($value)
+    protected function dd($value, ...$args)
     {
         echo "<pre>";
-        var_dump($value);
+        var_dump($value, $args);
         echo "</pre>";
         die();
     }
