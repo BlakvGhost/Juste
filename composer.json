@@ -17,5 +17,5 @@
   "require": {
     "symfony/dotenv": "^6.2"
   },
-  "minimum-stability": "dev"
+  "minimum-stability": "stable"
 }
