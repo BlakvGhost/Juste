@@ -13,5 +13,8 @@
       "name": "Kabirou ALASSANE",
       "email": "kabirou2001@gmail.com"
     }
-  ]
+  ],
+  "require": {
+    "symfony/dotenv": "^6.2"
+  }
 }
