@@ -1,6 +1,7 @@
 # Juste
 
- Bravo PHP MVC Framework Core
+Juste is the Core of Project Bravo, my personal PHP MVC framework, it essentially ensures the understanding of Models, Controller, the basic template engine.
+It also manages the Routing, the middlewares, the database, and especially my super nice homemade mini ORM without forgetting the easy sending of emails.
 
 ## Authors
 
