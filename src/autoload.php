@@ -38,7 +38,7 @@ $dotenv->loadEnv(dotEnvPath());
 
 $current_user = isset($_SESSION['user']) ? $_SESSION['user'] : [];
 
-require_once __DIR__ . '/Helpers/Autoload.php';
+require_once __DIR__ . '/Facades/Helpers/Autoload.php';
 
 require_once BASE_URL . DS . 'routes' . DS . 'web.php';
 
