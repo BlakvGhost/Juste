@@ -15,4 +15,4 @@ It also manages the Routing, the middlewares, the database, and especially my su
 
 ## Support
 
-For support, email me on kabirou2001@gmail.com.
+For support, email me on <kabirou2001@gmail.com>.

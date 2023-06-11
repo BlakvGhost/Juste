@@ -42,7 +42,11 @@ require_once __DIR__ . '/Facades/Helpers/Autoload.php';
 
 require_once BASE_URL . DS . 'routes' . DS . 'web.php';
 
-$payloads = isset($GLOBALS['payloads']) ? $GLOBALS['payloads'] : null;
+loadRoute();
+
+//dd($_BRAVO);
+
+$payloads = getBravo('payloads');
 
 if (!$payloads) {
     return require ERRORS_VIEW_PATH . DS . '404.php';

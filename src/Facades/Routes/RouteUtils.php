@@ -4,15 +4,19 @@ namespace Juste\Facades\Routes;
 
 use Juste\Facades\Helpers\Common;
 
+use \App\Kernel;
+
 class RouteUtils extends Common
 {
+    use Kernel;
+
     private $controller = null;
 
     private $function = null;
 
     public function __construct(private string $route, array $controller, private bool $isActiveRoute = false)
     {
-        $this->controller = $controller[0];
+        $this->controller = $controller[0] ?? $this::class;;
         $this->function = $controller[1] ?? 'index';
     }
 
@@ -22,23 +26,38 @@ class RouteUtils extends Common
      */
     public function name($alias): RouteUtils
     {
-        //echo debugWithInt();
-        $routes = $this->getDataOnSession('routes');
+        $routes = getBravo('routes');
 
         if (!isset($routes[$alias])) {
-            $routes = array_merge($routes, [$alias => $this->route]);
-
-            $this->setDataOnSession('routes', $routes);
+            updateBravo('routes', [$alias => $this->route]);
         }
 
         return $this;
     }
 
-    public function middleware(array $middlewares): RouteUtils
-    {   
-        if($this->isActiveRoute) {
-            
-        }    
+    public function middlewares(array $middlewares): RouteUtils
+    {
+        if ($this->isActiveRoute) {
+
+            foreach ($middlewares as $alias) {
+
+                if ($middleware = $this->middlewareAliases[$alias] ?? 0) {
+                    
+                    $_activeRoute = getBravo('activeRoute');
+                    $_middlewares = $_activeRoute['middlewares'] ?? [];
+
+                    $routeData = [
+                        ...$_activeRoute,
+                        'middlewares' => [
+                            ...$_middlewares,
+                            $alias => $middleware,
+                        ],
+                    ];
+
+                    setBravo('activeRoute', $routeData);
+                }
+            }
+        }
         return $this;
     }
 }

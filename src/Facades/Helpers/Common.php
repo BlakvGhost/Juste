@@ -115,7 +115,6 @@ class Common
      */
     protected function user($attr = false)
     {
-
         return isset($_SESSION['user']) ?
             ($attr ? $_SESSION['user'][$attr] : $_SESSION['user']) :
             [];
@@ -154,7 +153,7 @@ class Common
     protected function dd($value, ...$args)
     {
         echo "<pre>";
-        var_dump($value, $args);
+        var_dump($value, ...$args);
         echo "</pre>";
         die();
     }
@@ -165,8 +164,20 @@ class Common
      */
     protected function route(string $alias): string
     {
-        $routes = isset($_SESSION['routes']) ? $_SESSION['routes'] : [];
+        $routes = getBravo('routes');
 
-        return isset($routes[$alias]) ? '/' . $routes[$alias] : '/';
+        return isset($routes[$alias]) ? '/' . $routes[$alias] : $alias;
+    }
+
+     /**
+     * Retourne la route d'un url selon son alias
+     * @param string $alias The alias of the Route
+     */
+    protected function redirect(string $alias): Common
+    {
+        $path = $this->route($alias);
+
+        $this->redirecTo($path);
+        return $this;
     }
 }

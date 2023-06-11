@@ -6,12 +6,12 @@ use Juste\Facades\Routes\Dependance;
 
 class Route extends Dependance
 {
+    use Utilities;
+
     private function getRoute(): string
     {
         $request_uri = $this->server("REQUEST_URI");
         $route = strtolower(trim($request_uri, '/'));
-
-        $this->cors(explode('/', $route)[0]);
 
         return explode('?', $route)[0];
     }
@@ -57,30 +57,20 @@ class Route extends Dependance
         if ($this->isActiveRoute($routes['route'], $params)) {
 
             if (($this->server("REQUEST_METHOD") == $method) || $method == 'any') {
-                $function = $controller[1];
-                $instance = new $controller[0]();
+                global $_BRAVO;
 
-                if ($routes['params']) {
+                $params = $routes['params'];
 
-                    $param = $this->getParamFromUrl()['param'];
+                $param = $params ? $this->getParamFromUrl()['param'] : null;
 
-                    $injectable = $this->resolveDependance($routes['params'], $param);
+                $injectable = $params ? $this->resolveDependance($routes['params'], $param) : null;
 
-                    if ($injectable) {
-                        $payloads = $instance->$function($injectable);
-
-                        setPayloads($payloads);
-                    }
-
-                    if (!$injectable) {
-                        $payloads = $instance->$function($param);
-                        setPayloads($payloads);
-                    }
-                } else {
-                    $payloads =
-                        $instance->$function();
-                    setPayloads($payloads);
-                }
+                $_BRAVO['activeRoute'] = [
+                    'controller' => $controller,
+                    'params' => $params,
+                    'param' => $param,
+                    'injectable' => $injectable
+                ];
                 $active = 1;
             }
         }
@@ -99,13 +89,27 @@ class Route extends Dependance
             ['route' => "{$route}/:user", 'function' => 'destroy', "method" => 'DELETE']
         ];
 
+        $actives = [];
+
         foreach ($routes as $key => $r) {
             $controller_arr = [$controller, $r['function']];
-            $this->loadRoute($r['route'], $controller_arr, $r['method']);
+            $active = $this->loadRoute($r['route'], $controller_arr, $r['method']);
+
+            $actives[] = [
+                'route' => $r['route'],
+                'controller' => $controller_arr,
+                'active' => $active
+            ];
 
             $utils = new RouteUtils($r['route'], $controller_arr);
-            $utils->name($route . $r['function']);
+            $utils->name($route . '.' . $r['function']);
         }
+
+        $active = array_filter($actives, function ($elt) {
+            return $elt['active'];
+        });
+
+        return $active[0] ?? [];
     }
 
     /**
@@ -114,10 +118,10 @@ class Route extends Dependance
      * @param array $controller
      * @return RouteUtils
      */
-    public static function get(string $route, array $controller)
+    public static function get(string $route, array $controller): RouteUtils
     {
         $static = new static();
-
+        //dd("GET METHOD");
         $isActive = $static->loadRoute($route, $controller, "GET");
         return new RouteUtils($route, $controller, $isActive);
     }
@@ -125,7 +129,7 @@ class Route extends Dependance
     /**
      * Set POST route
      */
-    public static function post(string $route, array $controller)
+    public static function post(string $route, array $controller): RouteUtils
     {
         $static = new static();
 
@@ -133,7 +137,7 @@ class Route extends Dependance
         return new RouteUtils($route, $controller, $isActive);
     }
 
-    public static function any($route, $controller)
+    public static function any($route, $controller): RouteUtils
     {
         $static = new static();
 
@@ -145,14 +149,12 @@ class Route extends Dependance
     {
         $static = new static();
 
-        $static->loadResoucesRoute($route, $controller);
-        return;
-    }
+        $isActive = $static->loadResoucesRoute($route, $controller);
 
-    public static function cors(string $url)
-    {
-        if ($url == 'api') {
-            require_once BASE_URL . DS . 'config/cors.php';
-        }
+        return new RouteUtils(
+            $isActive['route'] ?? $route,
+            $isActive['controller'] ?? [$controller],
+            $isActive['route'] ?? 0
+        );
     }
 }

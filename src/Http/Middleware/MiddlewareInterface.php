@@ -3,5 +3,5 @@
 namespace Juste\Http\Middleware;
 
 interface MiddlewareInterface {
-    public function handle(): bool;
+    public function handle(): mixed;
 }
