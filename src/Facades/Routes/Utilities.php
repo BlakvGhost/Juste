@@ -22,9 +22,3 @@ trait Utilities
         return new RouteUtils('', []);
     }
 }
-
-class Test {
-    public function __construct($h) {
-        dd($h);
-    }
-}
