@@ -6,7 +6,7 @@ session_start();
 
 define('DS', DIRECTORY_SEPARATOR);
 
-define('BASE_URL', $_SERVER['DOCUMENT_ROOT']);
+define('BASE_URL', ROOT);
 
 define('VIEW_PATH', BASE_URL  . DS . 'views');
 define('ERRORS_VIEW_PATH', BASE_URL  . DS . 'views' . DS . 'errors');
