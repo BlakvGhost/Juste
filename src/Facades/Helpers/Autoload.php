@@ -87,7 +87,13 @@ function loadView(array $context)
 
     if (file_exists($viewPath)) {
         ob_start();
-        include VIEW_PATH . DS . 'index.php';;
+        $base = VIEW_PATH . DS . 'index.php';
+        
+        if (file_exists($base)) {
+            include($base);
+        } else {
+            include($viewPath);
+        }
         $output = ob_get_clean();
 
         $view = preg_replace_callback('/\{\{\s*\$([^}]+)\s*\}\}/', $replaceVariables, $output);
