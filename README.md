@@ -1,6 +1,6 @@
 # Juste
 
-Juste is the Core of Project Bravo, my personal PHP MVC framework, it essentially ensures the understanding of Models, Controller, the basic template engine.
+Juste is the Core of Project [Bravo, my personal PHP MVC framework](https://github.com/BlakvGhost/Bravo), it essentially ensures the understanding of Models, Controller, the basic template engine.
 It also manages the Routing, the middlewares, the database, and especially my super nice homemade mini ORM without forgetting the easy sending of emails.
 
 ![Packagist Version (custom server)](https://img.shields.io/packagist/v/Blakvghost/Juste?label=stable)
